@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "962115809664",
+    "project_id": "drp-constructions",
+    "storage_bucket": "drp-constructions.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:962115809664:android:f13cae2f07551688d91165",
+        "android_client_info": {
+          "package_name": "com.drp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBhi-l4jQQNzBW09ZzOp9jrOxhL1B_vdvg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
