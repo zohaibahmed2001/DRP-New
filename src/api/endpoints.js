@@ -1,7 +1,7 @@
 // ---( Live URL )--- //
 export const API_DOMAIN = __DEV__
-  ? "https://pro-fixer.demoappprojects.com/drp-construction/api"
-  : "https://pro-fixer.demoappprojects.com/drp-construction/api";
+  ? "https://drpconstructioninc.org/dashboard/api"
+  : "https://drpconstructioninc.org/dashboard/api";
 
 export const ENDPOINTS = {
   //Auth End Points:

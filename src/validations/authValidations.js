@@ -14,8 +14,12 @@ const SignUpSchema = Yup.object().shape({
   email: Yup.string().email('Invalid email').required('Email is required'),
 
   phone: Yup.string()
-    .required('Phone number is required')
-    .matches(/^\d{10}$/, 'Phone number must be 10 digits'),
+    .nullable()
+    .optional()
+    .matches(/^\d{10}$/, {
+      message: 'Phone number must be 10 digits',
+      excludeEmptyString: true,
+    }),
 
   password: Yup.string()
     .required('Password is required')

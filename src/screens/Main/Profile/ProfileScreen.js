@@ -1,5 +1,6 @@
 import {
   Image,
+  Modal,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
@@ -15,17 +16,18 @@ import { Container, Flex, Typography } from '../../../atomComponents';
 import { avatar, edit as Edit } from '../../../assets/images';
 import { BASEOPACITY, COLORS, GLOBALSTYLE } from '../../../globalStyle/Theme';
 import Sizer from '../../../helpers/Sizer';
-import { Header } from '../../../components';
+import { Button, Header } from '../../../components';
 import Icon from '../../../helpers/Icon';
 import { useKeyboard } from '../../../hooks/useKeyboard';
 import { handleLogout } from '../../../redux/slices/appSlice';
-import { logout } from '../../../api/userService';
+import { deleteAcount, logout } from '../../../api/userService';
 import { useCustomQuery } from '../../../query/useCustomQuery';
 import { queryClient } from '../../../api/api';
 
 const ProfileScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const { user } = useSelector(state => state.app);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
 
   function clearApp() {
     queryClient.clear();
@@ -44,6 +46,13 @@ const ProfileScreen = ({ navigation }) => {
     enabled: false,
   });
 
+  //Custom Delete Account Query Hook
+  const { refetch: triggerDeleteAccount, isLoading: isDeleting } = useCustomQuery({
+    queryKey: ['delete'],
+    queryFn: deleteAcount,
+    enabled: false,
+  });
+
   // Request Logout:
   const logoutHandler = () => {
     clearApp();
@@ -52,7 +61,21 @@ const ProfileScreen = ({ navigation }) => {
     });
   };
 
-  const ProfileMenuItem = ({ label, icon, iconFamily, onPress, color }) => (
+  // Request Delete Account:
+  const handleDeleteAccount = async () => {
+    try {
+      await triggerDeleteAccount();
+    } catch (e) {
+      console.log('Error deleting account:', e);
+    }
+    setDeleteModalVisible(false);
+    clearApp();
+    triggerLogout().finally(() => {
+      dispatch(handleLogout());
+    });
+  };
+
+  const ProfileMenuItem = ({ label, icon, iconFamily, onPress, color, iconColor }) => (
     <TouchableOpacity
       activeOpacity={BASEOPACITY}
       onPress={onPress}
@@ -64,7 +87,7 @@ const ProfileScreen = ({ navigation }) => {
             name={icon}
             iconFamily={iconFamily}
             size={Sizer.fS(20)}
-            color={COLORS.secondary}
+            color={iconColor || color || COLORS.secondary}
           />
         </View>
         <Typography
@@ -132,8 +155,81 @@ const ProfileScreen = ({ navigation }) => {
             onPress={logoutHandler}
             color={COLORS.red}
           />
+          <ProfileMenuItem
+            label="Delete Account"
+            icon="trash-2"
+            iconFamily="Feather"
+            onPress={() => setDeleteModalVisible(true)}
+            color={COLORS.red}
+            iconColor={COLORS.red}
+          />
         </View>
       </ScrollView>
+
+      <Modal
+        visible={deleteModalVisible}
+        statusBarTranslucent
+        transparent
+        animationType="fade"
+        onRequestClose={() => setDeleteModalVisible(false)}
+      >
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: COLORS.surface3,
+              marginHorizontal: 20,
+              paddingVertical: 30,
+              paddingHorizontal: 20,
+              borderRadius: 12,
+              width: '90%',
+            }}
+          >
+            <Typography
+              textAlign="center"
+              fFamily="interTightSemiBold600"
+              size={20}
+              color={COLORS.white100}
+            >
+              Are you sure you want to delete your account?
+            </Typography>
+
+            <Typography
+              size={14}
+              textAlign="center"
+              color={COLORS.grey200}
+              mT={10}
+            >
+              This action is permanent and cannot be undone.
+            </Typography>
+
+            <Flex gap={12} mT={30}>
+              <Button
+                btnStyle={{ flex: 1 }}
+                label="Delete"
+                type="primary"
+                textColor={COLORS.red}
+                onPress={handleDeleteAccount}
+                loadColor={COLORS.red}
+                loader={isDeleting}
+              />
+              <Button
+                btnStyle={{ flex: 1 }}
+                label="Cancel"
+                type="secondary"
+                onPress={() => setDeleteModalVisible(false)}
+                disabled={isDeleting}
+              />
+            </Flex>
+          </View>
+        </View>
+      </Modal>
     </Container>
   );
 };
